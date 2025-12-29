@@ -30,7 +30,7 @@ function Editor() {
     }
   }, [projectId]);
 
-  async function loadProject(id: number) {
+  async function loadProject(_id: number) {
     // Load project spec from database
     try {
       // For now, initialize with empty spec
@@ -47,7 +47,7 @@ function Editor() {
       });
 
       if (selected) {
-        const content = await readTextFile(selected.path);
+        const content = await readTextFile(selected as unknown as string);
         setYamlContent(content);
         // Parse YAML and extract scenes
         parseYamlContent(content);

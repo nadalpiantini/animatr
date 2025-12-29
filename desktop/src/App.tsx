@@ -18,7 +18,7 @@ function App() {
     async function checkSystem() {
       try {
         const deps = await invoke<Record<string, boolean>>("check_dependencies");
-        setDependencies(deps);
+        setDependencies(deps as { python: boolean; moho: boolean; blender: boolean; ffmpeg: boolean });
       } catch (error) {
         console.error("Failed to check dependencies:", error);
       } finally {

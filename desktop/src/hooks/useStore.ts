@@ -14,7 +14,9 @@ interface RenderJob {
   status: string;
   progress: number;
   currentScene?: string;
+  outputPath?: string;
   errorMessage?: string;
+  createdAt: string;
 }
 
 interface Dependencies {
