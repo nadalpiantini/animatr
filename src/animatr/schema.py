@@ -3,8 +3,10 @@
 from pathlib import Path
 from typing import Literal
 
+import re
+
 import yaml
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class OutputConfig(BaseModel):
@@ -13,6 +15,13 @@ class OutputConfig(BaseModel):
     format: Literal["mp4", "mov", "webm"] = "mp4"
     resolution: str = "1920x1080"
     fps: int = Field(default=30, ge=1, le=120)
+
+    @field_validator("resolution")
+    @classmethod
+    def validate_resolution(cls, v: str) -> str:
+        if not re.match(r"^\d+x\d+$", v):
+            raise ValueError("resolution debe tener formato 'WIDTHxHEIGHT' (ej: 1920x1080)")
+        return v
 
     @property
     def width(self) -> int:

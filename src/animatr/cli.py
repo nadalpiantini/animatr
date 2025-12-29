@@ -3,6 +3,8 @@
 from pathlib import Path
 
 import typer
+import yaml
+from pydantic import ValidationError
 from rich.console import Console
 
 app = typer.Typer(
@@ -48,7 +50,7 @@ def validate(
         console.print(f"  Versión: {spec.version}")
         console.print(f"  Escenas: {len(spec.scenes)}")
         console.print(f"  Output: {spec.output.format} @ {spec.output.resolution}")
-    except Exception as e:
+    except (ValidationError, yaml.YAMLError) as e:
         console.print(f"[bold red]✗ Error de validación:[/] {e}")
         raise typer.Exit(1)
 

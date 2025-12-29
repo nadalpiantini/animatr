@@ -1,5 +1,6 @@
 """Engine de audio/TTS para ANIMATR."""
 
+import hashlib
 import tempfile
 from pathlib import Path
 
@@ -37,7 +38,7 @@ class AudioEngine(Engine):
         from openai import OpenAI
 
         client = OpenAI()
-        output_path = self._temp_dir / f"{hash(config.text)}.mp3"
+        output_path = self._temp_dir / f"{hashlib.md5(config.text.encode()).hexdigest()[:16]}.mp3"
 
         response = client.audio.speech.create(
             model="tts-1",
