@@ -1,0 +1,55 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "ANIMATR",
+  "version": "0.1.0",
+  "identifier": "com.animatr.app",
+  "build": {
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:1420",
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "ANIMATR - Motor de Animacion",
+        "width": 1280,
+        "height": 800,
+        "minWidth": 800,
+        "minHeight": 600,
+        "resizable": true,
+        "fullscreen": false,
+        "center": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ]
+  },
+  "plugins": {
+    "dialog": {},
+    "fs": {
+      "scope": ["$HOME/.animatr/**", "$DOCUMENT/**", "$DOWNLOAD/**"]
+    },
+    "shell": {
+      "scope": [
+        {
+          "name": "python-animatr",
+          "cmd": "python",
+          "args": ["-m", "animatr", { "validator": "\\S+" }]
+        }
+      ]
+    }
+  }
+}
