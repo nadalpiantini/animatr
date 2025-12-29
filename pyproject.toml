@@ -31,6 +31,10 @@ dependencies = [
     "openai>=1.0",
     "mutagen>=1.47",
     "requests>=2.31",
+    # AI Agents dependencies
+    "crewai>=0.86",
+    "crewai-tools>=0.14",
+    "langchain-openai>=0.2",
 ]
 
 [project.optional-dependencies]

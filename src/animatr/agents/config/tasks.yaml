@@ -1,0 +1,162 @@
+# Configuración de Tareas ANIMATR
+# Cada tarea tiene: description, expected_output, agent
+
+intake_task:
+  description: >
+    Analyze the user input and convert it to a structured creative brief.
+
+    Input type: {input_type}
+    Content: {user_input}
+
+    Extract:
+    - Main topic and message
+    - Desired duration (infer from content if not specified)
+    - Tone and style (professional, casual, educational, etc.)
+    - Target audience
+    - Key points to cover
+    - Any technical requirements mentioned
+
+    If the input is vague, make reasonable assumptions and note them.
+  expected_output: >
+    A structured CreativeBrief in JSON format with:
+    - topic: string
+    - duration: number (seconds)
+    - tone: string
+    - audience: string
+    - style: string
+    - key_points: array of strings
+  agent: intake
+
+script_task:
+  description: >
+    Based on the creative brief, write engaging dialogue and narration.
+
+    Brief: {creative_brief}
+
+    Create a script with:
+    - Scene breakdown with clear transitions
+    - Natural dialogue for characters (TTS-friendly)
+    - Narration text with emotion markers [happy], [serious], etc.
+    - Timing cues for each section
+    - Character actions and expressions
+
+    Format using ESCENA markers:
+    ESCENA 1: [descripción]
+    PERSONAJE [emoción]: "Diálogo aquí"
+    [Acción del personaje]
+  expected_output: >
+    Complete script with:
+    - Multiple ESCENA sections
+    - Dialogue with emotion markers
+    - Timing estimates per scene
+    - Character action descriptions
+  agent: guionista
+
+design_task:
+  description: >
+    Create visual design specifications based on the script.
+
+    Script: {script}
+
+    Define:
+    - Character selection and configuration for each scene
+    - Background colors or images
+    - Scene composition and character positioning
+    - Color palette for visual consistency
+    - Transitions between scenes
+
+    Consider:
+    - Available Moho character assets
+    - Brand guidelines if mentioned
+    - Emotional tone of each scene
+  expected_output: >
+    Visual design specs in JSON format with:
+    - scenes: array of scene configs
+    - each scene: character, position, expression, background
+    - color_palette: array of hex colors
+    - transitions: array of transition types
+  agent: designer
+
+spec_task:
+  description: >
+    Generate a valid AnimationSpec YAML from script and design specs.
+
+    Script: {script}
+    Design: {design}
+
+    Create YAML with:
+    - version: "1.0"
+    - output: format (mp4), resolution (1920x1080), fps (30)
+    - scenes: array with complete scene definitions
+
+    Each scene MUST have:
+    - id: unique string identifier
+    - duration: format "Xs" (e.g., "5s")
+    - audio: text, voice, provider (openai/elevenlabs), speed
+    - background: color (hex) or image path
+    - character (optional): asset path, position, expression
+
+    Validate:
+    - All required fields present
+    - Duration format correct
+    - Audio text not empty
+    - Valid provider names
+  expected_output: >
+    Complete, valid AnimationSpec YAML ready for rendering.
+    File output: output/spec.yaml
+  agent: tecnico
+  output_file: output/spec.yaml
+
+render_task:
+  description: >
+    Execute the render pipeline to generate the final video.
+
+    Spec: {spec}
+
+    Steps:
+    1. Validate the spec structure
+    2. Generate audio for each scene using TTS
+    3. Create video segments with backgrounds
+    4. Compose final video with FFmpeg
+    5. Apply any transitions
+
+    Handle errors gracefully:
+    - Log specific error details
+    - Suggest fixes for common issues
+    - Report partial progress if interrupted
+  expected_output: >
+    Rendered video file path and production report including:
+    - Total render time
+    - Scene-by-scene status
+    - Any warnings or issues encountered
+    - Final file size and duration
+  agent: renderer
+
+qa_task:
+  description: >
+    Review the rendered video for quality assurance.
+
+    Video: {video_path}
+    Spec: {spec}
+
+    Evaluate (score 0-100 each):
+    - Lip-sync accuracy (±50ms tolerance)
+    - Dialogue coherence and naturalness
+    - Pacing matches spec timings
+    - Visual composition and consistency
+    - Audio clarity (no noise, proper levels)
+    - Technical specs (resolution, fps, format)
+
+    Determine:
+    - Overall weighted score
+    - APPROVED (≥80%) or REVISION_NEEDED
+    - Specific issues with recommended fixes
+    - Which agent should handle each issue
+  expected_output: >
+    QA report in JSON format with:
+    - scores: object with aspect scores
+    - overall_score: weighted average
+    - approved: boolean
+    - issues: array of {type, description, fix, priority, agent}
+    - recommendation: summary string
+  agent: qa
